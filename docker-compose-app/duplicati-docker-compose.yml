@@ -1,0 +1,29 @@
+version: '2.1'
+services:
+  duplicati:
+    image: ghcr.io/linuxserver/duplicati
+    container_name: duplicati
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=America/Panama
+    volumes:
+      - duplicati_data:/config
+      - /opt/Backups:/backups
+      #- duplicati:/source
+    #ports:
+      #- 8200:8200
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.duplicati.rule=Host(`duplicati.myportainer.tk`)"
+      - "traefik.http.routers.duplicati.entrypoints=websecure"
+      - "traefik.http.services.duplicati.loadbalancer.server.port=8200" 
+      #- "traefik.http.routers.duplicati.middlewares=forward-auth"
+volumes:
+  duplicati_data:
+networks:
+  default:
+    external: true
+    name: core_proxy
