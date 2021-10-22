@@ -1,0 +1,59 @@
+version: '3.1'
+services:
+  wordpress:
+    container_name: wp_prueba
+    image: wordpress
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db_wp_prueba
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress1:/var/www/html
+      - /home/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      #- ./phpfile/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+
+    extra_hosts:
+      - "myportainer.tk:172.18.0.2" #Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik # Cambiar por el dominio correcto
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.wp-secure.entrypoints=websecure"
+      - "traefik.http.routers.wp-secure.rule=Host(`prueba.myportainer.tk`) || Host(`www.prueba.myportainer.tk`)" # Cambiar por el dominio correcto, si es un subdominio borrar www o no funcionara
+  db:
+    container_name: db_wp_prueba
+    image: mariadb
+    networks:
+      - default
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - db1:/var/lib/mysql
+  adminer:
+    image: adminer
+    restart: "no"
+    container_name: gestordb
+    networks:
+      - default
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.adminer.rule=Host(`db.myportainer.tk`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.adminer.entrypoints=websecure"
+      - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+volumes:
+  wordpress1:
+  db1:
+networks:
+  default:
+    external: true
+    name: core_proxy

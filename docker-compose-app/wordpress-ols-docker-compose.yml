@@ -1,0 +1,143 @@
+version: "3"
+services:
+  demyx_db:
+    container_name: demyx_db
+    environment:
+      - DEMYX=/demyx
+      - DEMYX_CHARACTER_SET_SERVER=utf8
+      - DEMYX_COLLATION_SERVER=utf8_general_ci
+      - DEMYX_CONFIG=/etc/demyx
+      - DEMYX_DATABASE=demyx
+      - DEMYX_DEFAULT_CHARACTER_SET=utf8
+      - DEMYX_DOMAIN=lawebdeprueba.cf
+      - DEMYX_INNODB_BUFFER_POOL_SIZE=16M
+      - DEMYX_INNODB_DATA_FILE_PATH=ibdata1:10M:autoextend
+      - DEMYX_INNODB_FILE_PER_TABLE=1
+      - DEMYX_INNODB_FLUSH_LOG_AT_TRX_COMMIT=1
+      - DEMYX_INNODB_LOCK_WAIT_TIMEOUT=50
+      - DEMYX_INNODB_LOG_BUFFER_SIZE=8M
+      - DEMYX_INNODB_LOG_FILE_SIZE=5M
+      - DEMYX_INNODB_USE_NATIVE_AIO=1
+      - DEMYX_KEY_BUFFER_SIZE=20M
+      - DEMYX_LOG=/var/log/demyx
+      - DEMYX_MAX_ALLOWED_PACKET=16M
+      - DEMYX_MAX_CONNECTIONS=1000
+      - DEMYX_MYISAM_SORT_BUFFER_SIZE=8M
+      - DEMYX_NET_BUFFER_SIZE=8K
+      - DEMYX_PASSWORD=demyx
+      - DEMYX_READ_BUFFER=2M
+      - DEMYX_READ_BUFFER_SIZE=256K
+      - DEMYX_READ_RND_BUFFER_SIZE=512K
+      - DEMYX_ROOT_PASSWORD=demyx_root  # Mandatory
+      - DEMYX_SERVER_ID=1
+      - DEMYX_SORT_BUFFER_SIZE=20M
+      - DEMYX_TABLE_OPEN_CACHE=64
+      - DEMYX_USERNAME=demyx
+      - DEMYX_WRITE_BUFFER=2M
+      - TZ=America/Los_Angeles
+    image: demyx/mariadb
+    networks:
+      - core_proxy
+    restart: unless-stopped
+    volumes:
+      - demyx_db:/demyx
+      - demyx_log:/var/log/demyx
+    
+  demyx_wp:
+    container_name: demyx_wp
+    depends_on:
+      - demyx_db
+    environment:
+      - DEMYX=/demyx
+      - DEMYX_ADMIN=/demyx/ols
+      - DEMYX_ADMIN_IP=ALL
+      - DEMYX_ADMIN_PASSWORD=demyx
+      - DEMYX_ADMIN_PREFIX=true
+      - DEMYX_ADMIN_USERNAME=demyx
+      - DEMYX_BASIC_AUTH_PASSWORD=demyx
+      - DEMYX_BASIC_AUTH_USERNAME=demyx
+      - DEMYX_BASIC_AUTH_WP=false
+      - DEMYX_CACHE=false
+      - DEMYX_CLIENT_THROTTLE_BANDWIDTH_IN=0
+      - DEMYX_CLIENT_THROTTLE_BANDWIDTH_OUT=0
+      - DEMYX_CLIENT_THROTTLE_BAN_PERIOD=60
+      - DEMYX_CLIENT_THROTTLE_BLOCK_BAD_REQUEST=1
+      - DEMYX_CLIENT_THROTTLE_DYNAMIC=1000
+      - DEMYX_CLIENT_THROTTLE_GRACE_PERIOD=30
+      - DEMYX_CLIENT_THROTTLE_HARD_LIMIT=2000
+      - DEMYX_CLIENT_THROTTLE_SOFT_LIMIT=1500
+      - DEMYX_CLIENT_THROTTLE_STATIC=1000
+      - DEMYX_CONFIG=/etc/demyx
+      - DEMYX_CRAWLER_LOAD_LIMIT=5.2
+      - DEMYX_CRAWLER_USLEEP=1000
+      - DEMYX_DB_HOST=demyx_db
+      - DEMYX_DB_NAME=demyx
+      - DEMYX_DB_PASSWORD=demyx
+      - DEMYX_DB_USER=demyx
+      - DEMYX_DOMAIN=myportainer.tk # Cambiar por el dominio correcto
+      - DEMYX_LOG=/var/log/demyx
+      - DEMYX_LSPHP_VERSION=lsphp74
+      - DEMYX_PHP_LSAPI_CHILDREN=2000
+      - DEMYX_PHP_MAX_EXECUTION_TIME=300
+      - DEMYX_PHP_MEMORY=256M
+      - DEMYX_PHP_OPCACHE=true
+      - DEMYX_PHP_UPLOAD_LIMIT=128M
+      - DEMYX_RECAPTCHA_CONNECTION_LIMIT=500
+      - DEMYX_RECAPTCHA_ENABLE=1
+      - DEMYX_RECAPTCHA_TYPE=2
+      - DEMYX_TUNING_CONNECTION_TIMEOUT=300
+      - DEMYX_TUNING_KEEP_ALIVE_TIMEOUT=300
+      - DEMYX_TUNING_MAX_CONNECTIONS=20000
+      - DEMYX_TUNING_MAX_KEEP_ALIVE=1000
+      - DEMYX_TUNING_SMART_KEEP_ALIVE=1000
+      - DEMYX_WP_CONFIG=/demyx/wp-config.php
+      - DEMYX_XMLRPC=false
+    image: demyx/openlitespeed
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.demyx-wp-ols-assets-prefix.stripprefix.prefixes=/demyx/ols/"
+      - "traefik.http.middlewares.demyx-wp-ols-prefix.stripprefix.prefixes=/demyx/ols/"
+      - "traefik.http.middlewares.demyx-wp-redirect.redirectregex.permanent=true"
+      - "traefik.http.middlewares.demyx-wp-redirect.redirectregex.regex=^https?:\/\/(?:www\\.)?(.+)"
+      - "traefik.http.middlewares.demyx-wp-redirect.redirectregex.replacement=https://$${1}"
+      - "traefik.http.routers.demyx-wp-http.entrypoints=websecure"
+      - "traefik.http.routers.demyx-wp-http.middlewares=demyx-wp-redirect"
+      - "traefik.http.routers.demyx-wp-http.rule=Host(`myportainer.tk`) || Host(`www.myportainer.tk`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.demyx-wp-http.service=demyx-wp-http-port"
+      - "traefik.http.routers.demyx-wp-https.entrypoints=websecure"
+      - "traefik.http.routers.demyx-wp-https.rule=Host(`myportainer.tk`) || Host(`www.myportainer.tk`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.demyx-wp-https.service=demyx-wp-https-port"
+      - "traefik.http.routers.demyx-wp-https.tls.certresolver=demyx"
+      - "traefik.http.routers.demyx-wp-ols-assets.entrypoints=websecure"
+      - "traefik.http.routers.demyx-wp-ols-assets.priority=99"
+      - "traefik.http.routers.demyx-wp-ols-assets.rule=Host(`myportainer.tk`) && PathPrefix(`/res/`)"  # Cambiar por el dominio correcto
+      - "traefik.http.routers.demyx-wp-ols-assets.service=demyx-wp-ols-assets-port"
+      - "traefik.http.routers.demyx-wp-ols-assets.tls.certresolver=demyx"
+      - "traefik.http.routers.demyx-wp-ols.entrypoints=websecure"
+      - "traefik.http.routers.demyx-wp-ols.middlewares=demyx-wp-ols-prefix"
+      - "traefik.http.routers.demyx-wp-ols.priority=99"
+      - "traefik.http.routers.demyx-wp-ols.rule=Host(`myportainer.tk`) && PathPrefix(`/demyx/ols/`)" # https://domain.tld/demyx/ols/  # Cambiar por el dominio correcto
+      - "traefik.http.routers.demyx-wp-ols.service=demyx-wp-ols-port"
+      - "traefik.http.routers.demyx-wp-ols.tls.certresolver=demyx"
+      - "traefik.http.services.demyx-wp-http-port.loadbalancer.server.port=80"
+      - "traefik.http.services.demyx-wp-https-port.loadbalancer.server.port=80"
+      - "traefik.http.services.demyx-wp-ols-assets-port.loadbalancer.server.port=8080"
+      - "traefik.http.services.demyx-wp-ols-port.loadbalancer.server.port=8080"
+    networks:
+      - core_proxy
+    restart: unless-stopped
+    volumes:
+      - demyx_wp:/demyx
+      - demyx_log:/var/log/demyx
+    extra_hosts:
+      - "myportainer.tk:172.18.0.2" #172.18.0.2Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik
+volumes:
+  demyx_db:
+    name: demyx_db
+  demyx_log:
+    name: demyx_log
+  demyx_wp:
+    name: demyx_wp
+networks:
+  core_proxy:
+    external: true
