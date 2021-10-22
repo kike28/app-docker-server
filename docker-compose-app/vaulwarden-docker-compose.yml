@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  bitwarden:
+    image: vaultwarden/server:latest
+    container_name: bitwarden
+    restart: always
+    volumes:
+      - bw-data:/data
+    networks:
+      - core_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.bitwarden-ui.rule=Host(`bitwarden.myportainer.tk`)"
+      - "traefik.http.routers.bitwarden-ui.service=bitwarden-ui"
+      - "traefik.http.services.bitwarden-ui.loadbalancer.server.port=80"
+      - "traefik.http.routers.bitwarden-websocket.rule=Host(`bitwarden.myportainer.tk`) && Path(`/notifications/hub`)"
+      - "traefik.http.routers.bitwarden-websocket.service=bitwarden-websocket"
+      - "traefik.http.services.bitwarden-websocket.loadbalancer.server.port=3012"
+  backup:
+    image: jmqm/vaultwarden_backup:latest
+    container_name: vaultwarden_backup
+    volumes:
+      - bw-data:/data:ro # Read-only
+      - /opt/Backups:/backups
+
+      - /etc/localtime:/etc/localtime:ro # Container uses date from host.
+    environment:
+      - DELETE_AFTER=30
+      - CRON_TIME=00 00 * * * # Runs at 12:00 AM.
+      - UID=0
+      - GID=0
+    networks:
+      - core_proxy
+volumes:
+  bw-data:
+networks:
+  core_proxy:
+    external: true
