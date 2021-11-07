@@ -51,4 +51,4 @@ networks:
     ipam:
      config:
        - subnet: 172.18.0.0/16
-         gateway: 172.18.0.1
+         gateway: 172.18.0.1/16 # Si el gateway da problemas se elimina
