@@ -17,7 +17,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.duplicati.rule=Host(`duplicati.myportainer.tk`)"
+      - "traefik.http.routers.duplicati.rule=Host(`duplicati.directo.ml`)"
       - "traefik.http.routers.duplicati.entrypoints=websecure"
       - "traefik.http.services.duplicati.loadbalancer.server.port=8200" 
       #- "traefik.http.routers.duplicati.middlewares=forward-auth"
