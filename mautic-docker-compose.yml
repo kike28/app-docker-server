@@ -1,0 +1,42 @@
+version: "2"
+
+services:
+  database:
+    image: powertic/percona-docker
+    container_name: database
+    environment:
+      MYSQL_ROOT_PASSWORD: mypassword
+    # ports:
+    #  - "3306:3306"
+    volumes:
+      - database:/var/lib/mysql
+    restart: always
+    networks:
+      - default
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode=""
+
+  mautic:
+    container_name: mautic
+    image: mautic/mautic:v4
+    volumes:
+      - mautic_data:/var/www/html
+    environment:
+      - MAUTIC_DB_HOST=database
+      - MAUTIC_DB_USER=root
+      - MAUTIC_DB_PASSWORD=mypassword
+      - MAUTIC_DB_NAME=mautic4
+    restart: always
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.mautic-secure.entrypoints=websecure"
+      - "traefik.http.routers.mautic-secure.rule=Host(`mautic.directo.ml`)"
+volumes:
+  database:
+  mautic_data:
+networks:
+  default:
+    external: true
+    name: core_proxy
