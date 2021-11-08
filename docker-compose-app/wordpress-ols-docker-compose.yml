@@ -9,7 +9,7 @@ services:
       - DEMYX_CONFIG=/etc/demyx
       - DEMYX_DATABASE=demyx
       - DEMYX_DEFAULT_CHARACTER_SET=utf8
-      - DEMYX_DOMAIN=jimenozki.ga
+      - DEMYX_DOMAIN=dominio.tld # aqui dominio de tu web
       - DEMYX_INNODB_BUFFER_POOL_SIZE=16M
       - DEMYX_INNODB_DATA_FILE_PATH=ibdata1:10M:autoextend
       - DEMYX_INNODB_FILE_PER_TABLE=1
@@ -74,7 +74,7 @@ services:
       - DEMYX_DB_NAME=demyx
       - DEMYX_DB_PASSWORD=demyx
       - DEMYX_DB_USER=demyx
-      - DEMYX_DOMAIN=jimenozki.ga # Cambiar por el dominio correcto
+      - DEMYX_DOMAIN=dominio.tld # Cambiar por el dominio correcto
       - DEMYX_LOG=/var/log/demyx
       - DEMYX_LSPHP_VERSION=lsphp74
       - DEMYX_PHP_LSAPI_CHILDREN=2000
@@ -102,21 +102,21 @@ services:
       #- "traefik.http.middlewares.demyx-wp-redirect.redirectregex.replacement=https://$${1}"
       #- "traefik.http.routers.demyx-wp-http.entrypoints=websecure"
       #- "traefik.http.routers.demyx-wp-http.middlewares=demyx-wp-redirect"
-      #- "traefik.http.routers.demyx-wp-http.rule=Host(`jimenozki.ga`) || Host(`www.jimenozki.ga`)"
+      #- "traefik.http.routers.demyx-wp-http.rule=Host(`dominio.tld`) || Host(`www.dominio.tld`)"
       #- "traefik.http.routers.demyx-wp-http.service=demyx-wp-http-port"
       #- "traefik.http.routers.demyx-wp-https.entrypoints=websecure"
-      #- "traefik.http.routers.demyx-wp-https.rule=Host(`jimenozki.ga`) || Host(`www.jimenozki.ga`)" # https://domain.tld
+      #- "traefik.http.routers.demyx-wp-https.rule=Host(`dominio.tld`) || Host(`www.dominio.tld`)" # https://domain.tld
       #- "traefik.http.routers.demyx-wp-https.service=demyx-wp-https-port"
       #- "traefik.http.routers.demyx-wp-https.tls.certresolver=demyx"
       #- "traefik.http.routers.demyx-wp-ols-assets.entrypoints=websecure"
       #- "traefik.http.routers.demyx-wp-ols-assets.priority=99"
-      #- "traefik.http.routers.demyx-wp-ols-assets.rule=Host(`jimenozki.ga`) && PathPrefix(`/res/`)"
+      #- "traefik.http.routers.demyx-wp-ols-assets.rule=Host(`dominio.tld`) && PathPrefix(`/res/`)"
       #- "traefik.http.routers.demyx-wp-ols-assets.service=demyx-wp-ols-assets-port"
       #- "traefik.http.routers.demyx-wp-ols-assets.tls.certresolver=demyx"
       #- "traefik.http.routers.demyx-wp-ols.entrypoints=websecure"
       #- "traefik.http.routers.demyx-wp-ols.middlewares=demyx-wp-ols-prefix"
       #- "traefik.http.routers.demyx-wp-ols.priority=99"
-      #- "traefik.http.routers.demyx-wp-ols.rule=Host(`jimenozki.ga`) && PathPrefix(`/demyx/ols/`)" # https://domain.tld/demyx/ols/
+      #- "traefik.http.routers.demyx-wp-ols.rule=Host(`dominio.tld`) && PathPrefix(`/demyx/ols/`)" # https://domain.tld/demyx/ols/
       #- "traefik.http.routers.demyx-wp-ols.service=demyx-wp-ols-port"
       #- "traefik.http.routers.demyx-wp-ols.tls.certresolver=demyx"
       #- "traefik.http.services.demyx-wp-http-port.loadbalancer.server.port=80"
@@ -126,15 +126,15 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       - "traefik.http.routers.wp-secure.entrypoints=websecure"
-      - "traefik.http.routers.wp-secure.rule=Host(`jimenozki.ga`) || Host(`www.jimenozki.ga`)"
+      - "traefik.http.routers.wp-secure.rule=Host(`dominio.tld`) || Host(`www.dominio.tld`)" # cambia el dominio por el de tu web
     networks:
       - core_proxy
     restart: unless-stopped
     volumes:
       - demyx_wp:/demyx
       - demyx_log:/var/log/demyx
-    extra_hosts:
-      - "jimenozki.ga:172.18.0.2" #172.18.0.2Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik
+    #extra_hosts:
+      #- "dominio.tld:172.18.0.2" #172.18.0.2Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik
 volumes:
   demyx_db:
     name: demyx_db
