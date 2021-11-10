@@ -9,6 +9,8 @@ services:
       - bw-data:/data
     networks:
       - core_proxy
+    environment:
+      - SIGNUPS_ALLOWED=false # Debe estar en true para poder crear usuarios nuevos. Cambiar a false cuando ya no quiera permitir mas usuarios
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
