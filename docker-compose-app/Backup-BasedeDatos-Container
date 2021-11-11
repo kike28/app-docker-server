@@ -15,7 +15,7 @@ cat backup.sql | docker exec -i db_wp_prueba /usr/bin/mysql -uexampleuser -p'exa
 
 
 
-
+docker exec some-mysql sh -c 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > /some/path/on/your/host/all-databases.sql
 
 
 
@@ -48,10 +48,10 @@ cd $DUMPS_FOLDER && bzip2 --best $FILENAME
 #==============================================================================
 
 ## Settings
-MYSQL_ROOT_PASSWORD="MYSQL_ROOT_PASSWORD"
+MYSQL_ROOT_PASSWORD="example"
 DOCKER_IMAGE="mysql"
-BACKUP_DATE=`date +%d-%m-%Y`
-BACKUP_PATH="/backup/mysql"
+BACKUP_DATE=`date +%d-%m-%Y-%s-%H:%M:%S`
+BACKUP_PATH="/opt/Backups/mysql"
 BACKUP_RETENTION_DAYS="3"
 
 ## Go! 
@@ -89,3 +89,33 @@ if [ $BACKUP_RETENTION_DAYS ]; then
 fi
 
 logger "[MYSQL-DOCKER-BACKUP] INFO: Finished Backup Script"
+
+
+
+
+
+
+
+
+https://github.com/fradelg/docker-mysql-cron-backup
+
+mysql-cron-backup:
+    image: fradelg/mysql-cron-backup
+    depends_on:
+      - mariadb
+    volumes:
+      - ${VOLUME_PATH}/backup:/backup
+    environment:
+      - MYSQL_HOST=my_mariadb
+      - MYSQL_USER=root
+      - MYSQL_PASS=${MARIADB_ROOT_PASSWORD}
+      - MAX_BACKUPS=15
+      - INIT_BACKUP=0
+      # Every day at 03:00
+      - CRON_TIME=0 3 * * *
+      # Make it small
+      - GZIP_LEVEL=9
+    restart: unless-stopped
+
+volumes:
+  data:
