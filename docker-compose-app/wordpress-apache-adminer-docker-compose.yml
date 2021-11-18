@@ -22,7 +22,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.wp-secure.entrypoints=websecure"
-      - "traefik.http.routers.wp-secure.rule=Host(`prueba.myportainer.tk`) || Host(`www.prueba.myportainer.tk`)" # Cambiar por el dominio correcto, si es un subdominio borrar www o no funcionara
+      - "traefik.http.routers.wp-secure.rule=Host(`dominio.tld`) || Host(`www.dominio.tld`)" # Cambiar por el dominio correcto, si es un subdominio borrar www o no funcionara
   db:
     container_name: db_wp_prueba
     image: mariadb
@@ -47,7 +47,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.adminer.rule=Host(`db.myportainer.tk`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.adminer.rule=Host(`dominio.tld`)" # Cambiar por el dominio correcto
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 volumes:

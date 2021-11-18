@@ -18,25 +18,25 @@ services:
       - default
     environment:
       - PORT=3000
-      - ROOT_URL=https://rocket.directo.ml
+      - ROOT_URL=https://rocket.dominio.tld
       - MONGO_URL=mongodb://mongo:27017/rocketchat
       - MONGO_OPLOG_URL=mongodb://mongo:27017/local
       - ADMIN_USERNAME=enrique
       - ADMIN_PASS=enrique
       - ADMIN_EMAIL=enrique@hd.com
-      - OVERWRITE_SETTING_Site_Url=https://rocket.directo.ml
+      - OVERWRITE_SETTING_Site_Url=https://rocket.dominio.tld
       #- MAIL_URL=smtp://smtp.gmail.com
-      #- HTTP_PROXY=https://rocket.directo.ml
-      - HTTPS_PROXY=https://rocket.directo.ml
+      #- HTTP_PROXY=https://rocket.dominio.tld
+      - HTTPS_PROXY=https://rocket.dominio.tld
 #      - PORT=3000
-#      - ROOT_URL=http://rocket.directo.ml:3000
+#      - ROOT_URL=http://rocket.dominio.tld:3000
 #      - MONGO_URL=mongodb://mongo:27017/rocketchat
 #      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
 #       - MAIL_URL=smtp://smtp.email
 #       - HTTP_PROXY=http://proxy.domain.com
 #       - HTTPS_PROXY=http://proxy.domain.com
       #- PORT=3000
-      #- ROOT_URL=http://rocket.directo.ml # http://45.55.32.60:3000 # old value http://localhost:3000
+      #- ROOT_URL=http://rocket.dominio.tld # http://45.55.32.60:3000 # old value http://localhost:3000
       #- MONGO_URL=mongodb://mongo:27017/rocketchat
       #- MONGO_OPLOG_URL=mongodb://mongo:27017/local
       #- MAIL_URL=smtp://smtp.email
@@ -49,7 +49,7 @@ services:
      - "traefik.enable=true"
      - "traefik.docker.network=traefik"
      - "traefik.http.routers.rocket-secure.entrypoints=websecure"
-     - "traefik.http.routers.rocket-secure.rule=Host(`rocket.directo.ml`)"
+     - "traefik.http.routers.rocket-secure.rule=Host(`rocket.dominio.tld`)"
      - "traefik.backend.port=3000"
      - "traefik.port=3000"
      #- "traefik.http.services.rocket-websocket.loadbalancer.server.port=3000"

@@ -27,11 +27,15 @@ cd $DUMPS_FOLDER && (ls -t | head -n 7 ; ls -t) | uniq -u | xargs --no-run-if-em
 cd $DUMPS_FOLDER && bzip2 --best $FILENAME
 
 
-
+############### VER ZONA HORARIA DEL SISTEMA
+date +'%:z %Z'
+timedatectl #ver datos de zona horaria
 
 
 # Daily DB backup
 00 23 * * * awesomeproject /home/ubuntu/awesomeproject/bin/db-save.sh >> /home/ubuntu/cron.out.log 2>&1
+
+./respaldo2.sh >> /opt/Backups/cron.out.log 2>&1
 
 
 
@@ -92,7 +96,7 @@ logger "[MYSQL-DOCKER-BACKUP] INFO: Finished Backup Script"
 
 
 
-
+#######
 
 
 
