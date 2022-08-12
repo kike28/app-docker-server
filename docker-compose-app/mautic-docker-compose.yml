@@ -3,7 +3,7 @@ version: "2"
 services:
   database:
     image: powertic/percona-docker
-    container_name: database
+    container_name: mauticDatabase
     environment:
       MYSQL_ROOT_PASSWORD: mypassword
     # ports:
@@ -21,7 +21,7 @@ services:
     volumes:
       - mautic_data:/var/www/html
     environment:
-      - MAUTIC_DB_HOST=database
+      - MAUTIC_DB_HOST=mauticDatabase
       - MAUTIC_DB_USER=root
       - MAUTIC_DB_PASSWORD=mypassword
       - MAUTIC_DB_NAME=mautic4
@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
       - "traefik.http.routers.mautic-secure.entrypoints=websecure"
-      - "traefik.http.routers.mautic-secure.rule=Host(`mautic.directo.ml`)"
+      - "traefik.http.routers.mautic-secure.rule=Host(`mautic.jimenozki.gq`)"
 volumes:
   database:
   mautic_data:

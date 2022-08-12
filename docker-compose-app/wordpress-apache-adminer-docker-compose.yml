@@ -11,18 +11,18 @@ services:
       WORDPRESS_DB_NAME: exampledb
     volumes:
       - wordpress1:/var/www/html
-      - /home/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
+      #- /home/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       #- ./phpfile/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
 
-    extra_hosts:
-      - "myportainer.tk:172.18.0.2" #Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik # Cambiar por el dominio correcto
+    #extra_hosts:
+    #  - "myportainer.tk:172.18.0.2" #Apuntar la el dominio al Ip del Proxy Inverso en este caso la ip de Traefik # Cambiar por el dominio correcto
     networks:
       - default
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.wp-secure.entrypoints=websecure"
-      - "traefik.http.routers.wp-secure.rule=Host(`dominio.tld`) || Host(`www.dominio.tld`)" # Cambiar por el dominio correcto, si es un subdominio borrar www o no funcionara
+      - "traefik.http.routers.wp-secure1.entrypoints=websecure"
+      - "traefik.http.routers.wp-secure1.rule=Host(`wpapache.jimenozki.gq`) || Host(`wpapache.jimenozki.gq`)" # Cambiar por el dominio correcto, si es un subdominio borrar www o no funcionara
   db:
     container_name: db_wp_prueba
     image: mariadb
@@ -47,7 +47,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik"
-      - "traefik.http.routers.adminer.rule=Host(`dominio.tld`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.adminer.rule=Host(`adminer.jimenozki.gq`)" # Cambiar por el dominio correcto
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
 volumes:
