@@ -1,0 +1,33 @@
+version:
+  "3"
+  # POR VERIFICAR MANDA ERROR
+services:
+  filebrowser:
+    image: filebrowser/filebrowser
+    environment:
+      - UID=0
+      - GID=0
+      - TZ=Europe/Madrid
+    #ports:
+    #  - "8200:80"
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.filebrowser-secure.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser-secure.rule=Host(`file.jimenozki.ga`)"
+      #- "traefik.http.services.filebrowser-websocket.loadbalancer.server.port=80"
+    volumes:
+      - /:/srv
+      - /home/:/database.db
+        #environment:
+        #- FB_BASEURL=/filebrowser
+    restart: unless-stopped
+#volumes:
+#  db_storage:
+#  n8n_storage:
+networks:
+  default:
+    external: true
+    name: core_proxy

@@ -1,0 +1,55 @@
+version: "3.8"
+services:
+  db:
+    image: mariadb:10.7
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=enrique
+      - MARIADB_DATABASE=enrique
+      - MARIADB_USER=enrique
+      - MARIADB_PASSWORD=enrique
+      - MARIADB_MYSQL_LOCALHOST_USER=true
+    volumes:
+      - db_storage:/var/lib/mysql
+    networks:
+      - default
+    healthcheck:
+      test: "/usr/bin/mysql --user=enrique --password=enrique --execute 'SELECT 1;'"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  n8n:
+    image: n8nio/n8n
+    restart: always
+    environment:
+      - DB_TYPE=mariadb
+      - DB_MYSQLDB_HOST=db
+      - DB_MYSQLDB_DATABASE=enrique
+      - DB_MYSQLDB_USER=enrique
+      - DB_MYSQLDB_PASSWORD=enrique
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.n8n-secure.entrypoints=websecure"
+      - "traefik.http.routers.n8n-secure.rule=Host(`n8n.jimenozki.ga`)"
+      - "traefik.http.services.n8n-websocket.loadbalancer.server.port=5678"
+    #ports:
+    #  - 5678:5678
+    links:
+      - db
+    volumes:
+      - n8n_storage:/home/node/
+    networks:
+      - default
+    command: n8n start --tunnel
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  db_storage:
+  n8n_storage:
+networks:
+  default:
+    external: true
+    name: core_proxy
