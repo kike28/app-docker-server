@@ -1,0 +1,24 @@
+version: "3.3"
+# https://github.com/louislam/uptime-kuma/blob/master/docker/docker-compose.yml
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    volumes:
+      - uptime-kuma-data:/app/data
+    networks:
+      - core_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.uptimekuma-secure.entrypoints=websecure"
+      - "traefik.http.routers.uptimekuma-secure.rule=Host(`subdomain.dominio.tld`)" # || Host(`www.masiptv.net`)" # cambia el dominio por el de tu web
+      - "traefik.http.services.uptimekuma-websocket.loadbalancer.server.port=3001"
+    #ports:
+    #  - 3001:3001  # Puerto de escucha
+    restart: always
+volumes:
+  uptime-kuma-data:
+networks:
+  core_proxy:
+    external: true
