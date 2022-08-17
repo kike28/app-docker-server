@@ -4,6 +4,9 @@ services:
   db:
     image: mariadb:10.7
     restart: always
+    depends_on:
+      - portainer
+      - traefik
     environment:
       - MARIADB_ROOT_PASSWORD=enrique
       - MARIADB_DATABASE=enrique
@@ -45,8 +48,11 @@ services:
       - default
     command: n8n start --tunnel
     depends_on:
-      db:
-        condition: service_healthy
+      - traefik
+      - portainer
+      - db
+      #db:
+        #condition: service_healthy
 volumes:
   db_storage:
   n8n_storage:
