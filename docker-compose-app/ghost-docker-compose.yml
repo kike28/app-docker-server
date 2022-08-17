@@ -1,0 +1,48 @@
+version: "2"
+# https://github.com/bitnami/bitnami-docker-ghost
+services:
+  mysql_ghost:
+    image: docker.io/bitnami/mysql:8.0
+    volumes:
+      - "mysql_ghostdata:/bitnami/mysql"
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      #- ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_ROOT_PASSWORD=12345
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=12345
+      - MYSQL_DATABASE=db
+  ghost:
+    image: docker.io/bitnami/ghost:5
+    #ports:
+    #  - '80:2368'
+    volumes:
+      - "ghost_data:/bitnami/ghost"
+    networks:
+      - default
+    depends_on:
+      - mysql_ghost
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.ghost.rule=Host(`domain.tld`) || Host(`www.domain.tld`)" # Cambiar por el dominio correcto
+      - "traefik.http.routers.ghost.entrypoints=websecure"
+      - "traefik.http.services.ghost.loadbalancer.server.port=2368"
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      #- ALLOW_EMPTY_PASSWORD=yes
+      - GHOST_DATABASE_HOST=mysql_ghost
+      - GHOST_DATABASE_PORT_NUMBER=3306
+      - GHOST_DATABASE_USER=admin
+      - GHOST_DATABASE_PASSWORD=12345
+      - GHOST_DATABASE_NAME=db
+      #- GHOST_BLOG_TITLE=Blog
+      - GHOST_HOST=localhost
+      - url=http://domain.tld
+volumes:
+  ghost_data:
+  mysql_ghostdata:
+networks:
+  default:
+    external: true
+    name: core_proxy

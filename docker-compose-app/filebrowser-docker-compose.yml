@@ -1,0 +1,32 @@
+version: "3"
+# https://filebrowser.org/installation
+services:
+  filebrowser:
+    image: filebrowser/filebrowser
+    environment: #configurar usuario del sistema y zona horaria
+      - UID=0
+      - GID=0
+      - TZ=Europe/Madrid
+    #ports:
+    #  - "8200:80" este es el puerto de escucha
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik"
+      - "traefik.http.routers.filebrowser-secure.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser-secure.rule=Host(`subdominio.dominio.tld`)" #Cambiar
+      #- "traefik.http.services.filebrowser-websocket.loadbalancer.server.port=80"
+    volumes:
+      - /:/srv # Directorio que desea que maneje filebrowser
+      - /{ruta donde guardar}/database.db:/database.db #Crear el archivo database.db en el directoria antes de arrancar el contenedor
+        #environment:
+        #- FB_BASEURL=/filebrowser
+    restart: unless-stopped
+#volumes:
+#  volumen1:
+#  volumen2:
+networks:
+  default:
+    external: true
+    name: core_proxy
